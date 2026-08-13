@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Build outputs
+.next/
+.vinext/
+dist/
+out/
+var/
+models/
+
+# Environment files
+.env
+.DS_Store

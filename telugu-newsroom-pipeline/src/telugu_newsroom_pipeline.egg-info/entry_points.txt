@@ -1,0 +1,2 @@
+[console_scripts]
+newsroom-pipeline = telugu_newsroom.cli:main

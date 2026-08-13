@@ -1,0 +1,22 @@
+services:
+  mediaops-api:
+    build: .
+    ports:
+      - "8787:8787"
+    volumes:
+      - mediaops-data:/data
+      # Mount your provider executables and change the commands below.
+      - ./adapters:/adapters:ro
+    environment:
+      MEDIAOPS_SPEECH_COMMAND: ${MEDIAOPS_SPEECH_COMMAND:-python /adapters/deepgram_speech.py}
+      MEDIAOPS_EDITORIAL_COMMAND: ${MEDIAOPS_EDITORIAL_COMMAND:-}
+      MEDIAOPS_FFMPEG: /usr/bin/ffmpeg
+      MEDIAOPS_FFPROBE: /usr/bin/ffprobe
+      MEDIAOPS_YT_DLP: /usr/local/bin/yt-dlp
+      DEEPGRAM_API_KEY: ${DEEPGRAM_API_KEY:-}
+      DEEPGRAM_MODEL: ${DEEPGRAM_MODEL:-nova-3}
+      DEEPGRAM_DIARIZE_MODEL: ${DEEPGRAM_DIARIZE_MODEL:-latest}
+    restart: unless-stopped
+
+volumes:
+  mediaops-data:

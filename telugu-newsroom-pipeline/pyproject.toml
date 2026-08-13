@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "telugu-newsroom-pipeline"
+version = "0.1.0"
+description = "Evidence-first long-video analysis and social news clipping pipeline."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Proprietary" }
+authors = [{ name = "AXIOMIA / TV5 pipeline prototype" }]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+media = ["scenedetect[opencv]>=0.6.7"]
+
+[project.scripts]
+newsroom-pipeline = "telugu_newsroom.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

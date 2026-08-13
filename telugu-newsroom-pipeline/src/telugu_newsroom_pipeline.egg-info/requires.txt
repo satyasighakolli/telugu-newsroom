@@ -1,0 +1,6 @@
+
+[dev]
+pytest>=8
+
+[media]
+scenedetect[opencv]>=0.6.7

@@ -1,0 +1,42 @@
+{
+  "language": "te",
+  "min_clip_seconds": 12.0,
+  "target_clip_seconds": 35.0,
+  "max_clip_seconds": 75.0,
+  "boundary_threshold": 0.56,
+  "shot_snap_tolerance_seconds": 0.75,
+  "speaker_change_weight": 0.24,
+  "semantic_novelty_weight": 0.34,
+  "pause_weight": 0.24,
+  "visual_cut_weight": 0.18,
+  "score_weights": {
+    "editorial_importance": 0.25,
+    "hook_strength": 0.18,
+    "self_contained": 0.19,
+    "speaker_clarity": 0.15,
+    "audio_quality": 0.13,
+    "visual_quality": 0.10
+  },
+  "loudness_targets_lufs": {
+    "youtube": -14.0,
+    "facebook": -16.0,
+    "instagram": -16.0,
+    "x": -16.0,
+    "telegram": -16.0,
+    "broadcast": -23.0
+  },
+  "entities": [
+    {
+      "id": "nara-chandrababu-naidu",
+      "canonical_name": "Nara Chandrababu Naidu",
+      "aliases": ["Chandrababu Naidu", "చంద్రబాబు నాయుడు", "చంద్రబాబు"],
+      "kind": "personality"
+    },
+    {
+      "id": "andhra-pradesh-government",
+      "canonical_name": "Andhra Pradesh Government",
+      "aliases": ["ఆంధ్రప్రదేశ్ ప్రభుత్వం", "ఏపీ ప్రభుత్వం", "AP government"],
+      "kind": "organization"
+    }
+  ]
+}
