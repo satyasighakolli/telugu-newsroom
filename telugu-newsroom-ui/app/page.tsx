@@ -148,7 +148,7 @@ function stageState(job: JobManifest | null, nodeId: string): NodeStatus {
     if (failed && audioReady) return "failed";
     return job.status === "analyzing" ? "running" : "idle";
   }
-  if (nodeId === "publish") return topicsReady ? "review" : "idle";
+  if (nodeId === "publish") return job?.status === "rendering" ? "running" : topicsReady ? "review" : "idle";
   return "idle";
 }
 
@@ -198,7 +198,23 @@ function StatusPill({ status }: { status: NodeStatus }) {
   return <span className={`status status-${status}`}>{status}</span>;
 }
 
-function NodePreview({ node, clipId, jobId, apiBase, onRender }: { node: WorkflowNode; clipId?: string; jobId?: string; apiBase?: string; onRender?: (clipId: string, aspect: "16:9" | "9:16") => void }) {
+function NodePreview({
+  node,
+  clipId,
+  jobId,
+  apiBase,
+  packages = [],
+  renderingClip,
+  onRender,
+}: {
+  node: WorkflowNode;
+  clipId?: string;
+  jobId?: string;
+  apiBase?: string;
+  packages?: PackageSummary[];
+  renderingClip?: string | null;
+  onRender?: (clipId: string, aspect: "16:9" | "9:16") => void;
+}) {
   if (node.kind === "source" || node.kind === "clip") {
     return (
       <div className={`media-preview ${node.kind === "clip" ? "media-small" : ""}`}>
@@ -211,29 +227,48 @@ function NodePreview({ node, clipId, jobId, apiBase, onRender }: { node: Workflo
   if (node.kind === "audio") return <div className="node-wave" aria-label="Audio waveform preview">{fallbackWaveform.slice(0, 30).map((height, index) => <i key={index} style={{ height: `${Math.max(7, height / 2)}px` }} />)}</div>;
   if (node.kind === "vision") return <div className="frame-strip">{[0, 1, 2].map((item) => <i key={item}><span /></i>)}</div>;
   if (node.kind === "topic") return <div className="topic-list"><span>Semantic</span><span>Speaker</span><span>Visual</span></div>;
+
+  const handlePlatformClick = (aspect: "16:9" | "9:16") => {
+    if (!clipId) {
+      window.alert("Please upload a video and run the pipeline first to generate clips for export.");
+      return;
+    }
+    const existing = packages.find((p) => p.clip_id === clipId && p.aspect === aspect);
+    if (existing && existing.files.video && apiBase) {
+      window.open(`${cleanBase(apiBase)}${existing.files.video}`, "_blank");
+    } else if (onRender) {
+      onRender(clipId, aspect);
+    }
+  };
+
+  const isRendering = Boolean(renderingClip && clipId && renderingClip === clipId);
+
   return (
     <div className="destination-grid" onClick={(e) => e.stopPropagation()} style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "5px" }}>
       <button
         type="button"
-        title="Export 16:9 YouTube Video Package"
-        onClick={() => clipId && onRender && onRender(clipId, "16:9")}
-        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+        title={clipId ? "Export / Download 16:9 YouTube Video Package" : "Upload video to export YouTube package"}
+        onClick={() => handlePlatformClick("16:9")}
+        disabled={isRendering}
+        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: isRendering ? "rgba(113,51,239,0.08)" : "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
         <YouTubeIcon size={20} />
       </button>
       <button
         type="button"
-        title="Export 9:16 Instagram Reel Package"
-        onClick={() => clipId && onRender && onRender(clipId, "9:16")}
-        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+        title={clipId ? "Export / Download 9:16 Instagram Reel Package" : "Upload video to export Reel package"}
+        onClick={() => handlePlatformClick("9:16")}
+        disabled={isRendering}
+        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: isRendering ? "rgba(113,51,239,0.08)" : "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
         <InstagramIcon size={20} />
       </button>
       <button
         type="button"
-        title="Export Facebook Watch Video Package"
-        onClick={() => clipId && onRender && onRender(clipId, "16:9")}
-        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+        title={clipId ? "Export / Download Facebook Watch Video Package" : "Upload video to export Facebook package"}
+        onClick={() => handlePlatformClick("16:9")}
+        disabled={isRendering}
+        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: isRendering ? "rgba(113,51,239,0.08)" : "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
         <FacebookIcon size={20} />
       </button>
@@ -241,6 +276,12 @@ function NodePreview({ node, clipId, jobId, apiBase, onRender }: { node: Workflo
         href={jobId && apiBase ? `${cleanBase(apiBase)}/api/jobs/${jobId}/srt` : "#"}
         target="_blank"
         rel="noreferrer"
+        onClick={(e) => {
+          if (!jobId) {
+            e.preventDefault();
+            window.alert("Please upload a video and run the pipeline first to download subtitles.");
+          }
+        }}
         title="Download Subtitles SRT & Audio for Telegram Channel"
         style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: "#ffffff", color: "#0f121d", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
@@ -250,12 +291,33 @@ function NodePreview({ node, clipId, jobId, apiBase, onRender }: { node: Workflo
   );
 }
 
-function WorkflowCard({ node, selected, clipId, jobId, apiBase, onRender, onSelect }: { node: WorkflowNode; selected: boolean; clipId?: string; jobId?: string; apiBase?: string; onRender?: (clipId: string, aspect: "16:9" | "9:16") => void; onSelect: () => void }) {
+function WorkflowCard({
+  node,
+  selected,
+  clipId,
+  jobId,
+  apiBase,
+  packages,
+  renderingClip,
+  onRender,
+  onSelect,
+}: {
+  node: WorkflowNode;
+  selected: boolean;
+  clipId?: string;
+  jobId?: string;
+  apiBase?: string;
+  packages?: PackageSummary[];
+  renderingClip?: string | null;
+  onRender?: (clipId: string, aspect: "16:9" | "9:16") => void;
+  onSelect: () => void;
+}) {
   return (
     <article className={`workflow-node ${selected ? "is-selected" : ""}`} style={{ "--x": `${node.x}px`, "--y": `${node.y}px`, "--accent": node.accent } as CSSProperties} onClick={onSelect} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onSelect(); } }} role="button" tabIndex={0} aria-pressed={selected}>
       <span className="port port-in" /><span className="port port-out" />
       <span className="node-topline"><span className="node-eyebrow">{node.eyebrow}</span><StatusPill status={node.status} /></span>
-      <strong>{node.name}</strong><NodePreview node={node} clipId={clipId} jobId={jobId} apiBase={apiBase} onRender={onRender} />
+      <strong>{node.name}</strong>
+      <NodePreview node={node} clipId={clipId} jobId={jobId} apiBase={apiBase} packages={packages} renderingClip={renderingClip} onRender={onRender} />
       <span className="node-description">{node.description}</span><span className="node-metric">{node.metric}</span>
     </article>
   );
@@ -278,6 +340,17 @@ function Inspector({ node, clip, packages, apiBase, jobId, rendering, onClipChan
     onClipChange(updated);
   };
   const clipPackages = clip ? packages.filter((item) => item.clip_id === clip.id) : [];
+
+  const handleInspectorExport = (targetAspect: "16:9" | "9:16") => {
+    if (!clip) return;
+    const existing = clipPackages.find((p) => p.aspect === targetAspect);
+    if (existing && existing.files.video) {
+      window.open(`${cleanBase(apiBase)}${existing.files.video}`, "_blank");
+    } else {
+      onRender(clip.id, targetAspect);
+    }
+  };
+
   return (
     <aside className="inspector">
       <div className="inspector-heading"><div><span>INSPECTOR</span><h2>{node.name}</h2></div><span className="inspector-dot" style={{ background: node.accent }} /></div>
@@ -313,30 +386,30 @@ function Inspector({ node, clip, packages, apiBase, jobId, rendering, onClipChan
         <div className="output-chips" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "6px" }}>
           <button
             type="button"
-            onClick={() => clip && onRender(clip.id, "16:9")}
+            onClick={() => handleInspectorExport("16:9")}
             disabled={!clip || rendering}
             style={{ padding: "10px 8px", borderRadius: "8px", background: "#ffffff", border: "1px solid #e2e5f0", color: "#0f121d", fontWeight: "bold", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
           >
             <YouTubeIcon size={20} />
-            <span>YouTube 16:9</span>
+            <span>{clipPackages.some((p) => p.aspect === "16:9") ? "Download 16:9" : "Export YouTube"}</span>
           </button>
           <button
             type="button"
-            onClick={() => clip && onRender(clip.id, "9:16")}
+            onClick={() => handleInspectorExport("9:16")}
             disabled={!clip || rendering}
             style={{ padding: "10px 8px", borderRadius: "8px", background: "#ffffff", border: "1px solid #e2e5f0", color: "#0f121d", fontWeight: "bold", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
           >
             <InstagramIcon size={20} />
-            <span>IG Reels 9:16</span>
+            <span>{clipPackages.some((p) => p.aspect === "9:16") ? "Download 9:16" : "Export IG Reels"}</span>
           </button>
           <button
             type="button"
-            onClick={() => clip && onRender(clip.id, "16:9")}
+            onClick={() => handleInspectorExport("16:9")}
             disabled={!clip || rendering}
             style={{ padding: "10px 8px", borderRadius: "8px", background: "#ffffff", border: "1px solid #e2e5f0", color: "#0f121d", fontWeight: "bold", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
           >
             <FacebookIcon size={20} />
-            <span>Facebook Watch</span>
+            <span>FB Watch</span>
           </button>
           <a
             href={jobId ? `${cleanBase(apiBase)}/api/jobs/${jobId}/srt` : "#"}
@@ -673,7 +746,7 @@ export default function Home() {
             </div>
           );
         })()}
-        {liveNodes.map((node) => <WorkflowCard key={node.id} node={node} selected={selected.id === node.id} clipId={selectedClip?.id} jobId={job?.id} apiBase={apiBase} onRender={renderPackage} onSelect={() => setSelectedId(node.id)} />)}<div className="canvas-note note-one"><span>01</span><p>Every clip keeps source timestamps and evidence IDs.</p></div><div className="canvas-note note-two" style={{ left: `${publishNode.x}px` }}><span>02</span><p>Editors approve before anything reaches publish.</p></div></div></div><div className="minimap"><div className="mini-flow"><i /><i /><i /><i /><i /></div><span>WORKFLOW MAP</span></div></section>
+        {liveNodes.map((node) => <WorkflowCard key={node.id} node={node} selected={selected.id === node.id} clipId={node.kind === "publish" ? (selectedClip?.id || clips[0]?.id) : node.clipId || selectedClip?.id || clips[0]?.id} jobId={job?.id} apiBase={apiBase} packages={packages} renderingClip={renderingClip} onRender={renderPackage} onSelect={() => setSelectedId(node.id)} />)}<div className="canvas-note note-one"><span>01</span><p>Every clip keeps source timestamps and evidence IDs.</p></div><div className="canvas-note note-two" style={{ left: `${publishNode.x}px` }}><span>02</span><p>Editors approve before anything reaches publish.</p></div></div></div><div className="minimap"><div className="mini-flow"><i /><i /><i /><i /><i /></div><span>WORKFLOW MAP</span></div></section>
         <Inspector node={selected} clip={selectedClip} packages={packages} apiBase={apiBase} jobId={job?.id} rendering={renderingClip === selectedClip?.id} onClipChange={updateClip} onRender={renderPackage} />
       </div>
     ) : (
