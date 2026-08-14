@@ -152,6 +152,48 @@ function stageState(job: JobManifest | null, nodeId: string): NodeStatus {
   return "idle";
 }
 
+function YouTubeIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z" fill="#FF0000"/>
+      <path d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#FFFFFF"/>
+    </svg>
+  );
+}
+
+function InstagramIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" fill="url(#ig-grad-icon)"/>
+      <defs>
+        <linearGradient id="ig-grad-icon" x1="0" y1="24" x2="24" y2="0" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FFD600"/>
+          <stop offset="0.5" stopColor="#FF0169"/>
+          <stop offset="1" stopColor="#D300C5"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+function FacebookIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+      <circle cx="12" cy="12" r="12" fill="#1877F2"/>
+      <path d="M15.3 12.4l.6-3.8h-3.6V6.1c0-1 .5-2 2-2h1.6V.9S14.4.6 13 .6c-2.9 0-4.8 1.8-4.8 5v2.9H4.9v3.8h3.3V24h4.5V12.4h2.6z" fill="#FFFFFF"/>
+    </svg>
+  );
+}
+
+function TelegramIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+      <circle cx="12" cy="12" r="12" fill="#229ED9"/>
+      <path d="M5.4 11.9l11.7-4.5c.8-.3 1.5.2 1.3 1.2l-2 9.4c-.1.6-.5.8-1 .5l-3.1-2.3-1.5 1.4c-.2.2-.3.3-.6.3l.2-3.1 5.7-5.1c.2-.2-.1-.3-.4-.1l-7 4.4-3-.9c-.7-.2-.7-.7.1-1z" fill="#FFFFFF"/>
+    </svg>
+  );
+}
+
 function StatusPill({ status }: { status: NodeStatus }) {
   return <span className={`status status-${status}`}>{status}</span>;
 }
@@ -173,40 +215,40 @@ function NodePreview({ node, clipId, jobId, apiBase, onRender }: { node: Workflo
     <div className="destination-grid" onClick={(e) => e.stopPropagation()} style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "4px" }}>
       <button
         type="button"
-        title="Export 16:9 YouTube Package"
+        title="Export 16:9 YouTube Video Package"
         onClick={() => clipId && onRender && onRender(clipId, "16:9")}
-        style={{ padding: "5px 2px", border: "1px solid rgba(220,38,38,0.3)", borderRadius: "6px", background: "rgba(220,38,38,0.08)", color: "#dc2626", fontWeight: "bold", fontSize: "9px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "2px" }}
+        style={{ padding: "6px 2px", border: "1px solid #e2e5f0", borderRadius: "6px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "3px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}
       >
-        <span style={{ fontSize: "11px" }}>🔴</span>
-        <span style={{ fontSize: "8px", fontWeight: "800" }}>YT</span>
+        <YouTubeIcon size={18} />
+        <span style={{ fontSize: "7px", fontWeight: "800", color: "#dc2626" }}>YT</span>
       </button>
       <button
         type="button"
-        title="Export 9:16 Instagram Reel"
+        title="Export 9:16 Instagram Reel Package"
         onClick={() => clipId && onRender && onRender(clipId, "9:16")}
-        style={{ padding: "5px 2px", border: "1px solid rgba(164,0,170,0.3)", borderRadius: "6px", background: "rgba(164,0,170,0.08)", color: "#A400AA", fontWeight: "bold", fontSize: "9px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "2px" }}
+        style={{ padding: "6px 2px", border: "1px solid #e2e5f0", borderRadius: "6px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "3px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}
       >
-        <span style={{ fontSize: "11px" }}>📸</span>
-        <span style={{ fontSize: "8px", fontWeight: "800" }}>IG</span>
+        <InstagramIcon size={18} />
+        <span style={{ fontSize: "7px", fontWeight: "800", color: "#A400AA" }}>IG</span>
       </button>
       <button
         type="button"
-        title="Export Facebook Video Package"
+        title="Export Facebook Watch Video Package"
         onClick={() => clipId && onRender && onRender(clipId, "16:9")}
-        style={{ padding: "5px 2px", border: "1px solid rgba(37,99,235,0.3)", borderRadius: "6px", background: "rgba(37,99,235,0.08)", color: "#2563eb", fontWeight: "bold", fontSize: "9px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "2px" }}
+        style={{ padding: "6px 2px", border: "1px solid #e2e5f0", borderRadius: "6px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "3px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}
       >
-        <span style={{ fontSize: "11px" }}>🟦</span>
-        <span style={{ fontSize: "8px", fontWeight: "800" }}>FB</span>
+        <FacebookIcon size={18} />
+        <span style={{ fontSize: "7px", fontWeight: "800", color: "#1877F2" }}>FB</span>
       </button>
       <a
         href={jobId && apiBase ? `${cleanBase(apiBase)}/api/jobs/${jobId}/srt` : "#"}
         target="_blank"
         rel="noreferrer"
         title="Download Subtitles SRT & Audio for Telegram Channel"
-        style={{ padding: "5px 2px", border: "1px solid rgba(14,165,233,0.3)", borderRadius: "6px", background: "rgba(14,165,233,0.08)", color: "#0ea5e9", fontWeight: "bold", fontSize: "9px", textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "2px" }}
+        style={{ padding: "6px 2px", border: "1px solid #e2e5f0", borderRadius: "6px", background: "#ffffff", color: "#0f121d", textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "3px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}
       >
-        <span style={{ fontSize: "11px" }}>✈️</span>
-        <span style={{ fontSize: "8px", fontWeight: "800" }}>TG</span>
+        <TelegramIcon size={18} />
+        <span style={{ fontSize: "7px", fontWeight: "800", color: "#229ED9" }}>TG</span>
       </a>
     </div>
   );
@@ -271,39 +313,43 @@ function Inspector({ node, clip, packages, apiBase, jobId, rendering, onClipChan
         {(clip.overlap_count > 0 || clip.speech_overlap_count > 0) && <p className="quality-warning">Review required: {clip.overlap_count} clip overlap(s), {clip.speech_overlap_count} speech overlap(s).</p>}
       </> : <div className="inspector-section"><label>Configuration</label><div className="setting-row"><span>Language</span><strong>Telugu</strong></div><div className="setting-row"><span>Evidence mode</span><strong>Strict</strong></div><div className="setting-row"><span>Human gate</span><strong>Required</strong></div></div>}
       <div className="inspector-section">
-        <label>Supported Outputs (Click to Download / Export)</label>
-        <div className="output-chips" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", marginTop: "6px" }}>
+        <label>Export Platforms & Formats (Click to Run / Download)</label>
+        <div className="output-chips" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "6px" }}>
           <button
             type="button"
-            onClick={() => clip && onRender(clip.id, aspect)}
+            onClick={() => clip && onRender(clip.id, "16:9")}
             disabled={!clip || rendering}
-            style={{ padding: "8px 6px", borderRadius: "6px", background: "#7133EF", color: "#ffffff", fontWeight: "bold", border: "1px solid #7133EF", cursor: "pointer", fontSize: "10px", textAlign: "center", boxSizing: "border-box" }}
+            style={{ padding: "10px 8px", borderRadius: "8px", background: "#ffffff", border: "1px solid #e2e5f0", color: "#0f121d", fontWeight: "bold", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
           >
-            🎬 MP4 ({aspect})
+            <YouTubeIcon size={20} />
+            <span>YouTube 16:9</span>
           </button>
-          <a
-            href={jobId ? `${cleanBase(apiBase)}/api/jobs/${jobId}/audio` : "#"}
-            target="_blank"
-            rel="noreferrer"
-            style={{ padding: "8px 6px", borderRadius: "6px", background: "#ffffff", border: "1px solid #A400AA", color: "#A400AA", fontWeight: "bold", textDecoration: "none", fontSize: "10px", textAlign: "center", display: "block", boxSizing: "border-box" }}
+          <button
+            type="button"
+            onClick={() => clip && onRender(clip.id, "9:16")}
+            disabled={!clip || rendering}
+            style={{ padding: "10px 8px", borderRadius: "8px", background: "#ffffff", border: "1px solid #e2e5f0", color: "#0f121d", fontWeight: "bold", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
           >
-            🎵 MP3 Audio
-          </a>
+            <InstagramIcon size={20} />
+            <span>IG Reels 9:16</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => clip && onRender(clip.id, "16:9")}
+            disabled={!clip || rendering}
+            style={{ padding: "10px 8px", borderRadius: "8px", background: "#ffffff", border: "1px solid #e2e5f0", color: "#0f121d", fontWeight: "bold", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
+          >
+            <FacebookIcon size={20} />
+            <span>Facebook Watch</span>
+          </button>
           <a
             href={jobId ? `${cleanBase(apiBase)}/api/jobs/${jobId}/srt` : "#"}
             target="_blank"
             rel="noreferrer"
-            style={{ padding: "8px 6px", borderRadius: "6px", background: "#ffffff", border: "1px solid #2563eb", color: "#2563eb", fontWeight: "bold", textDecoration: "none", fontSize: "10px", textAlign: "center", display: "block", boxSizing: "border-box" }}
+            style={{ padding: "10px 8px", borderRadius: "8px", background: "#ffffff", border: "1px solid #e2e5f0", color: "#0f121d", fontWeight: "bold", textDecoration: "none", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
           >
-            📝 SRT Subtitles
-          </a>
-          <a
-            href={jobId ? `${cleanBase(apiBase)}/api/jobs/${jobId}/clips` : "#"}
-            target="_blank"
-            rel="noreferrer"
-            style={{ padding: "8px 6px", borderRadius: "6px", background: "#ffffff", border: "1px solid #059669", color: "#059669", fontWeight: "bold", textDecoration: "none", fontSize: "10px", textAlign: "center", display: "block", boxSizing: "border-box" }}
-          >
-            📊 JSON Data
+            <TelegramIcon size={20} />
+            <span>Telegram SRT</span>
           </a>
         </div>
       </div>
