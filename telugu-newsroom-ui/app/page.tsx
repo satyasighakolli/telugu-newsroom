@@ -206,6 +206,7 @@ function NodePreview({
   packages = [],
   renderingClip,
   onRender,
+  onOpenUpload,
 }: {
   node: WorkflowNode;
   clipId?: string;
@@ -214,6 +215,7 @@ function NodePreview({
   packages?: PackageSummary[];
   renderingClip?: string | null;
   onRender?: (clipId: string, aspect: "16:9" | "9:16" | "4:5" | "1:1") => void;
+  onOpenUpload?: () => void;
 }) {
   const [activeMenu, setActiveMenu] = useState<"yt" | "ig" | "fb" | "tg" | null>(null);
 
@@ -230,10 +232,15 @@ function NodePreview({
   if (node.kind === "vision") return <div className="frame-strip">{[0, 1, 2].map((item) => <i key={item}><span /></i>)}</div>;
   if (node.kind === "topic") return <div className="topic-list"><span>Semantic</span><span>Speaker</span><span>Visual</span></div>;
 
-  const handleExport = (aspect: "16:9" | "9:16" | "4:5" | "1:1") => {
+  const handleExport = (aspect: "16:9" | "9:16" | "4:5" | "1:1", event?: React.MouseEvent) => {
+    if (event) event.stopPropagation();
     setActiveMenu(null);
-    if (!clipId) {
-      window.alert("Please upload a video and run the pipeline first to generate clips for export.");
+    if (!clipId || !jobId) {
+      if (onOpenUpload) {
+        onOpenUpload();
+      } else {
+        window.alert("Please upload a video and run the pipeline first to generate clips for export.");
+      }
       return;
     }
     const existing = packages.find((p) => p.clip_id === clipId && p.aspect === aspect);
@@ -251,7 +258,7 @@ function NodePreview({
       <button
         type="button"
         title="YouTube Export Formats (16:9 Bulletin / 9:16 Shorts)"
-        onClick={() => setActiveMenu(activeMenu === "yt" ? null : "yt")}
+        onClick={(e) => { e.stopPropagation(); setActiveMenu(activeMenu === "yt" ? null : "yt"); }}
         disabled={isRendering}
         style={{ height: "38px", border: activeMenu === "yt" ? "1.5px solid #FF0000" : "1px solid #e2e5f0", borderRadius: "8px", background: isRendering ? "rgba(113,51,239,0.08)" : "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
@@ -260,7 +267,7 @@ function NodePreview({
       <button
         type="button"
         title="Instagram Export Formats (9:16 Reels / 4:5 Portrait / 1:1 Square)"
-        onClick={() => setActiveMenu(activeMenu === "ig" ? null : "ig")}
+        onClick={(e) => { e.stopPropagation(); setActiveMenu(activeMenu === "ig" ? null : "ig"); }}
         disabled={isRendering}
         style={{ height: "38px", border: activeMenu === "ig" ? "1.5px solid #D300C5" : "1px solid #e2e5f0", borderRadius: "8px", background: isRendering ? "rgba(113,51,239,0.08)" : "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
@@ -269,7 +276,7 @@ function NodePreview({
       <button
         type="button"
         title="Facebook Export Formats (16:9 Watch / 9:16 Reels / 1:1 Square)"
-        onClick={() => setActiveMenu(activeMenu === "fb" ? null : "fb")}
+        onClick={(e) => { e.stopPropagation(); setActiveMenu(activeMenu === "fb" ? null : "fb"); }}
         disabled={isRendering}
         style={{ height: "38px", border: activeMenu === "fb" ? "1.5px solid #1877F2" : "1px solid #e2e5f0", borderRadius: "8px", background: isRendering ? "rgba(113,51,239,0.08)" : "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
@@ -278,7 +285,7 @@ function NodePreview({
       <button
         type="button"
         title="Telegram Channel Broadcast Package"
-        onClick={() => setActiveMenu(activeMenu === "tg" ? null : "tg")}
+        onClick={(e) => { e.stopPropagation(); setActiveMenu(activeMenu === "tg" ? null : "tg"); }}
         style={{ height: "38px", border: activeMenu === "tg" ? "1.5px solid #229ED9" : "1px solid #e2e5f0", borderRadius: "8px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
         <TelegramIcon size={20} />
@@ -290,24 +297,24 @@ function NodePreview({
           {activeMenu === "yt" && (
             <>
               <div style={{ fontSize: "9px", fontWeight: "800", color: "#FF0000", letterSpacing: "0.5px" }}>🔴 YOUTUBE EXPORT FORMATS</div>
-              <button type="button" onClick={() => handleExport("16:9")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>▶ YouTube 16:9 Bulletin</button>
-              <button type="button" onClick={() => handleExport("9:16")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>⚡ YouTube Shorts 9:16</button>
+              <button type="button" onClick={(e) => handleExport("16:9", e)} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>▶ YouTube 16:9 Bulletin</button>
+              <button type="button" onClick={(e) => handleExport("9:16", e)} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>⚡ YouTube Shorts 9:16</button>
             </>
           )}
           {activeMenu === "ig" && (
             <>
               <div style={{ fontSize: "9px", fontWeight: "800", color: "#D300C5", letterSpacing: "0.5px" }}>📸 INSTAGRAM EXPORT FORMATS</div>
-              <button type="button" onClick={() => handleExport("9:16")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>📱 IG Reels 9:16</button>
-              <button type="button" onClick={() => handleExport("4:5")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>🖼️ IG Portrait Post 4:5</button>
-              <button type="button" onClick={() => handleExport("1:1")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>⏹️ IG Square Feed 1:1</button>
+              <button type="button" onClick={(e) => handleExport("9:16", e)} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>📱 IG Reels 9:16</button>
+              <button type="button" onClick={(e) => handleExport("4:5", e)} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>🖼️ IG Portrait Post 4:5</button>
+              <button type="button" onClick={(e) => handleExport("1:1", e)} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>⏹️ IG Square Feed 1:1</button>
             </>
           )}
           {activeMenu === "fb" && (
             <>
               <div style={{ fontSize: "9px", fontWeight: "800", color: "#1877F2", letterSpacing: "0.5px" }}>🟦 FACEBOOK EXPORT FORMATS</div>
-              <button type="button" onClick={() => handleExport("16:9")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>📺 FB Watch 16:9</button>
-              <button type="button" onClick={() => handleExport("9:16")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>⚡ FB Reels 9:16</button>
-              <button type="button" onClick={() => handleExport("1:1")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>⏹️ FB Square Video 1:1</button>
+              <button type="button" onClick={(e) => handleExport("16:9", e)} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>📺 FB Watch 16:9</button>
+              <button type="button" onClick={(e) => handleExport("9:16", e)} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>⚡ FB Reels 9:16</button>
+              <button type="button" onClick={(e) => handleExport("1:1", e)} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>⏹️ FB Square Video 1:1</button>
             </>
           )}
           {activeMenu === "tg" && (
@@ -315,12 +322,12 @@ function NodePreview({
               <div style={{ fontSize: "9px", fontWeight: "800", color: "#229ED9", letterSpacing: "0.5px" }}>✈️ TELEGRAM CHANNEL BUNDLE</div>
               {jobId && apiBase ? (
                 <>
-                  <a href={`${cleanBase(apiBase)}/api/jobs/${jobId}/srt`} target="_blank" rel="noreferrer" style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", textDecoration: "none" }}>📝 Download Subtitles (.SRT)</a>
-                  <a href={`${cleanBase(apiBase)}/api/jobs/${jobId}/audio`} target="_blank" rel="noreferrer" style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", textDecoration: "none" }}>🎵 Download Audio (.MP3)</a>
-                  <a href={`${cleanBase(apiBase)}/api/jobs/${jobId}/clips`} target="_blank" rel="noreferrer" style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", textDecoration: "none" }}>📊 Export JSON Metadata</a>
+                  <a href={`${cleanBase(apiBase)}/api/jobs/${jobId}/srt`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", textDecoration: "none" }}>📝 Download Subtitles (.SRT)</a>
+                  <a href={`${cleanBase(apiBase)}/api/jobs/${jobId}/audio`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", textDecoration: "none" }}>🎵 Download Audio (.MP3)</a>
+                  <a href={`${cleanBase(apiBase)}/api/jobs/${jobId}/clips`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", textDecoration: "none" }}>📊 Export JSON Metadata</a>
                 </>
               ) : (
-                <div style={{ fontSize: "9px", color: "#777" }}>Upload a video first</div>
+                <button type="button" onClick={(e) => { e.stopPropagation(); if (onOpenUpload) onOpenUpload(); }} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#7133EF", cursor: "pointer", textAlign: "left" }}>Upload video to export package →</button>
               )}
             </>
           )}
@@ -339,6 +346,7 @@ function WorkflowCard({
   packages,
   renderingClip,
   onRender,
+  onOpenUpload,
   onSelect,
 }: {
   node: WorkflowNode;
@@ -349,6 +357,7 @@ function WorkflowCard({
   packages?: PackageSummary[];
   renderingClip?: string | null;
   onRender?: (clipId: string, aspect: "16:9" | "9:16" | "4:5" | "1:1") => void;
+  onOpenUpload?: () => void;
   onSelect: () => void;
 }) {
   return (
@@ -356,9 +365,11 @@ function WorkflowCard({
       <span className="port port-in" /><span className="port port-out" />
       <span className="node-topline"><span className="node-eyebrow">{node.eyebrow}</span><StatusPill status={node.status} /></span>
       <strong>{node.name}</strong>
-      <NodePreview node={node} clipId={clipId} jobId={jobId} apiBase={apiBase} packages={packages} renderingClip={renderingClip} onRender={onRender} />
+      <NodePreview node={node} clipId={clipId} jobId={jobId} apiBase={apiBase} packages={packages} renderingClip={renderingClip} onRender={onRender} onOpenUpload={onOpenUpload} />
       <span className="node-description">{node.description}</span><span className="node-metric">{node.metric}</span>
     </article>
+  );
+}
   );
 }
 
@@ -600,8 +611,10 @@ export default function Home() {
         const latest = await apiRequest<JobManifest>(apiBase, `/api/jobs/${job.id}`);
         if (cancelled) return;
         setJob(latest);
-        if (latest.status === "ready" && clips.length === 0) {
+        if (latest.status === "ready" || latest.status === "rendering") {
           await loadArtifacts(latest);
+        }
+        if (latest.status === "ready") {
           setRenderingClip(null);
         }
       } catch {
@@ -611,16 +624,13 @@ export default function Home() {
 
     refresh();
 
-    if (job.status === "ready" || job.status === "failed") {
-      return;
-    }
-
-    const timer = window.setInterval(refresh, 2500);
+    const isBusy = ["rendering", "queued", "transcribing", "segmenting", "scoring", "analyzing"].includes(job.status);
+    const timer = window.setInterval(refresh, isBusy ? 1200 : 3500);
     return () => {
       cancelled = true;
       window.clearInterval(timer);
     };
-  }, [job?.id, job?.status, connection, apiBase, loadArtifacts, clips.length]);
+  }, [job?.id, job?.status, connection, apiBase, loadArtifacts]);
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -785,7 +795,7 @@ export default function Home() {
             </div>
           );
         })()}
-        {liveNodes.map((node) => <WorkflowCard key={node.id} node={node} selected={selected.id === node.id} clipId={node.kind === "publish" ? (selectedClip?.id || clips[0]?.id) : node.clipId || selectedClip?.id || clips[0]?.id} jobId={job?.id} apiBase={apiBase} packages={packages} renderingClip={renderingClip} onRender={renderPackage} onSelect={() => setSelectedId(node.id)} />)}<div className="canvas-note note-one"><span>01</span><p>Every clip keeps source timestamps and evidence IDs.</p></div><div className="canvas-note note-two" style={{ left: `${publishNode.x}px` }}><span>02</span><p>Editors approve before anything reaches publish.</p></div></div></div><div className="minimap"><div className="mini-flow"><i /><i /><i /><i /><i /></div><span>WORKFLOW MAP</span></div></section>
+        {liveNodes.map((node) => <WorkflowCard key={node.id} node={node} selected={selected.id === node.id} clipId={node.kind === "publish" ? (selectedClip?.id || clips[0]?.id) : node.clipId || selectedClip?.id || clips[0]?.id} jobId={job?.id} apiBase={apiBase} packages={packages} renderingClip={renderingClip} onRender={renderPackage} onOpenUpload={() => setDialogOpen(true)} onSelect={() => setSelectedId(node.id)} />)}<div className="canvas-note note-one"><span>01</span><p>Every clip keeps source timestamps and evidence IDs.</p></div><div className="canvas-note note-two" style={{ left: `${publishNode.x}px` }}><span>02</span><p>Editors approve before anything reaches publish.</p></div></div></div><div className="minimap"><div className="mini-flow"><i /><i /><i /><i /><i /></div><span>WORKFLOW MAP</span></div></section>
         <Inspector node={selected} clip={selectedClip} packages={packages} apiBase={apiBase} jobId={job?.id} rendering={renderingClip === selectedClip?.id} onClipChange={updateClip} onRender={renderPackage} />
       </div>
     ) : (
