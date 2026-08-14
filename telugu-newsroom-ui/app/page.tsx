@@ -370,8 +370,6 @@ function WorkflowCard({
     </article>
   );
 }
-  );
-}
 
 function Inspector({ node, clip, packages, apiBase, jobId, rendering, onClipChange, onRender }: { node: WorkflowNode; clip?: Clip; packages: PackageSummary[]; apiBase: string; jobId?: string; rendering: boolean; onClipChange: (clip: Clip) => void; onRender: (clipId: string, aspect: "16:9" | "9:16" | "4:5" | "1:1") => Promise<void> }) {
   const [aspect, setAspect] = useState<"16:9" | "9:16" | "4:5" | "1:1">("16:9");
