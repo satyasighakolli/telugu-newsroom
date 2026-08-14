@@ -212,43 +212,39 @@ function NodePreview({ node, clipId, jobId, apiBase, onRender }: { node: Workflo
   if (node.kind === "vision") return <div className="frame-strip">{[0, 1, 2].map((item) => <i key={item}><span /></i>)}</div>;
   if (node.kind === "topic") return <div className="topic-list"><span>Semantic</span><span>Speaker</span><span>Visual</span></div>;
   return (
-    <div className="destination-grid" onClick={(e) => e.stopPropagation()} style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "4px" }}>
+    <div className="destination-grid" onClick={(e) => e.stopPropagation()} style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "5px" }}>
       <button
         type="button"
         title="Export 16:9 YouTube Video Package"
         onClick={() => clipId && onRender && onRender(clipId, "16:9")}
-        style={{ padding: "6px 2px", border: "1px solid #e2e5f0", borderRadius: "6px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "3px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}
+        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
-        <YouTubeIcon size={18} />
-        <span style={{ fontSize: "7px", fontWeight: "800", color: "#dc2626" }}>YT</span>
+        <YouTubeIcon size={20} />
       </button>
       <button
         type="button"
         title="Export 9:16 Instagram Reel Package"
         onClick={() => clipId && onRender && onRender(clipId, "9:16")}
-        style={{ padding: "6px 2px", border: "1px solid #e2e5f0", borderRadius: "6px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "3px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}
+        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
-        <InstagramIcon size={18} />
-        <span style={{ fontSize: "7px", fontWeight: "800", color: "#A400AA" }}>IG</span>
+        <InstagramIcon size={20} />
       </button>
       <button
         type="button"
         title="Export Facebook Watch Video Package"
         onClick={() => clipId && onRender && onRender(clipId, "16:9")}
-        style={{ padding: "6px 2px", border: "1px solid #e2e5f0", borderRadius: "6px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "3px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}
+        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
-        <FacebookIcon size={18} />
-        <span style={{ fontSize: "7px", fontWeight: "800", color: "#1877F2" }}>FB</span>
+        <FacebookIcon size={20} />
       </button>
       <a
         href={jobId && apiBase ? `${cleanBase(apiBase)}/api/jobs/${jobId}/srt` : "#"}
         target="_blank"
         rel="noreferrer"
         title="Download Subtitles SRT & Audio for Telegram Channel"
-        style={{ padding: "6px 2px", border: "1px solid #e2e5f0", borderRadius: "6px", background: "#ffffff", color: "#0f121d", textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "3px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}
+        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: "#ffffff", color: "#0f121d", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
-        <TelegramIcon size={18} />
-        <span style={{ fontSize: "7px", fontWeight: "800", color: "#229ED9" }}>TG</span>
+        <TelegramIcon size={20} />
       </a>
     </div>
   );

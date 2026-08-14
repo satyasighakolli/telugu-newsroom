@@ -128,7 +128,9 @@ button { color: inherit; }
 .frame-strip { height: 43px; display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; }
 .frame-strip i { position: relative; overflow: hidden; border-radius: 5px; background: linear-gradient(140deg,#735d41,#232c35); border: 1px solid #373b42; }.frame-strip i::before { content: ""; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #b07b64; left: 18px; top: 4px; }.frame-strip i span { position: absolute; width: 32px; height: 25px; border-radius: 12px 12px 2px 2px; background: #1c2026; left: 11px; top: 19px; }
 .topic-list { display: flex; flex-wrap: wrap; gap: 4px; padding: 7px; border: 1px solid #e2e5f0; border-radius: 6px; background: #f8f9fc; }.topic-list span { padding: 4px 6px; border: 1px solid rgba(113,51,239,.2); border-radius: 12px; font-size: 7px; color: #7133EF; background: rgba(113,51,239,.08); font-weight: bold; }
-.destination-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }.destination-grid span { height: 37px; display: grid; place-items: center; border: 1px solid #e2e5f0; border-radius: 6px; background: rgba(164,0,170,.06); color: #A400AA; font-size: 8px; font-weight: 900; }
+.destination-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.destination-grid button, .destination-grid a { transition: all 0.15s ease; }
+.destination-grid button:hover, .destination-grid a:hover { transform: translateY(-1px); border-color: #7133EF !important; background: #f8f9fc !important; box-shadow: 0 4px 12px rgba(113,51,239,0.12) !important; }
 
 .edge { position: absolute; height: 1px; transform-origin: left center; z-index: 2; background: repeating-linear-gradient(90deg, #94a3b8 0 4px, transparent 4px 8px); opacity: .7; }
 .edge::before { content: ""; position: absolute; width: 6px; height: 6px; right: -3px; top: -2.5px; border-radius: 50%; background: #ffffff; border: 1px solid #7133EF; }
