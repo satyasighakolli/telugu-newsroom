@@ -1,0 +1,29 @@
+# 📺 Telugu Newsroom AI MediaOps Platform Requirements
+
+# Core ASR Speech-to-Text & PyTorch Engine
+faster-whisper>=1.0.0
+torch>=2.0.0
+torchaudio>=2.0.0
+huggingface-hub>=0.20.0
+
+# Computer Vision & Scene Cut Detection
+scenedetect[opencv]>=0.6.7
+opencv-python>=4.8.0
+av>=10.0.0
+numpy>=1.24.0
+scipy>=1.10.0
+
+# AI Editorial & Proofreader (Qwen 2.5 & Gemini 3.5)
+json-repair>=0.25.0
+google-generativeai>=0.8.0
+requests>=2.31.0
+urllib3>=2.0.0
+
+# Video Download & Media Utilities
+yt-dlp>=2024.0.0
+static-ffmpeg>=2.5
+tqdm>=4.66.0
+python-dotenv>=1.0.0
+
+# Development & Testing
+pytest>=8.0.0
