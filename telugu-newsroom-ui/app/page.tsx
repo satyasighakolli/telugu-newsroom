@@ -213,8 +213,10 @@ function NodePreview({
   apiBase?: string;
   packages?: PackageSummary[];
   renderingClip?: string | null;
-  onRender?: (clipId: string, aspect: "16:9" | "9:16") => void;
+  onRender?: (clipId: string, aspect: "16:9" | "9:16" | "4:5" | "1:1") => void;
 }) {
+  const [activeMenu, setActiveMenu] = useState<"yt" | "ig" | "fb" | "tg" | null>(null);
+
   if (node.kind === "source" || node.kind === "clip") {
     return (
       <div className={`media-preview ${node.kind === "clip" ? "media-small" : ""}`}>
@@ -228,7 +230,8 @@ function NodePreview({
   if (node.kind === "vision") return <div className="frame-strip">{[0, 1, 2].map((item) => <i key={item}><span /></i>)}</div>;
   if (node.kind === "topic") return <div className="topic-list"><span>Semantic</span><span>Speaker</span><span>Visual</span></div>;
 
-  const handlePlatformClick = (aspect: "16:9" | "9:16") => {
+  const handleExport = (aspect: "16:9" | "9:16" | "4:5" | "1:1") => {
+    setActiveMenu(null);
     if (!clipId) {
       window.alert("Please upload a video and run the pipeline first to generate clips for export.");
       return;
@@ -244,49 +247,85 @@ function NodePreview({
   const isRendering = Boolean(renderingClip && clipId && renderingClip === clipId);
 
   return (
-    <div className="destination-grid" onClick={(e) => e.stopPropagation()} style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "5px" }}>
+    <div className="destination-grid" onClick={(e) => e.stopPropagation()} style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "5px", position: "relative" }}>
       <button
         type="button"
-        title={clipId ? "Export / Download 16:9 YouTube Video Package" : "Upload video to export YouTube package"}
-        onClick={() => handlePlatformClick("16:9")}
+        title="YouTube Export Formats (16:9 Bulletin / 9:16 Shorts)"
+        onClick={() => setActiveMenu(activeMenu === "yt" ? null : "yt")}
         disabled={isRendering}
-        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: isRendering ? "rgba(113,51,239,0.08)" : "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+        style={{ height: "38px", border: activeMenu === "yt" ? "1.5px solid #FF0000" : "1px solid #e2e5f0", borderRadius: "8px", background: isRendering ? "rgba(113,51,239,0.08)" : "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
         <YouTubeIcon size={20} />
       </button>
       <button
         type="button"
-        title={clipId ? "Export / Download 9:16 Instagram Reel Package" : "Upload video to export Reel package"}
-        onClick={() => handlePlatformClick("9:16")}
+        title="Instagram Export Formats (9:16 Reels / 4:5 Portrait / 1:1 Square)"
+        onClick={() => setActiveMenu(activeMenu === "ig" ? null : "ig")}
         disabled={isRendering}
-        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: isRendering ? "rgba(113,51,239,0.08)" : "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+        style={{ height: "38px", border: activeMenu === "ig" ? "1.5px solid #D300C5" : "1px solid #e2e5f0", borderRadius: "8px", background: isRendering ? "rgba(113,51,239,0.08)" : "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
         <InstagramIcon size={20} />
       </button>
       <button
         type="button"
-        title={clipId ? "Export / Download Facebook Watch Video Package" : "Upload video to export Facebook package"}
-        onClick={() => handlePlatformClick("16:9")}
+        title="Facebook Export Formats (16:9 Watch / 9:16 Reels / 1:1 Square)"
+        onClick={() => setActiveMenu(activeMenu === "fb" ? null : "fb")}
         disabled={isRendering}
-        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: isRendering ? "rgba(113,51,239,0.08)" : "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+        style={{ height: "38px", border: activeMenu === "fb" ? "1.5px solid #1877F2" : "1px solid #e2e5f0", borderRadius: "8px", background: isRendering ? "rgba(113,51,239,0.08)" : "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
         <FacebookIcon size={20} />
       </button>
-      <a
-        href={jobId && apiBase ? `${cleanBase(apiBase)}/api/jobs/${jobId}/srt` : "#"}
-        target="_blank"
-        rel="noreferrer"
-        onClick={(e) => {
-          if (!jobId) {
-            e.preventDefault();
-            window.alert("Please upload a video and run the pipeline first to download subtitles.");
-          }
-        }}
-        title="Download Subtitles SRT & Audio for Telegram Channel"
-        style={{ height: "38px", border: "1px solid #e2e5f0", borderRadius: "8px", background: "#ffffff", color: "#0f121d", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+      <button
+        type="button"
+        title="Telegram Channel Broadcast Package"
+        onClick={() => setActiveMenu(activeMenu === "tg" ? null : "tg")}
+        style={{ height: "38px", border: activeMenu === "tg" ? "1.5px solid #229ED9" : "1px solid #e2e5f0", borderRadius: "8px", background: "#ffffff", color: "#0f121d", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
         <TelegramIcon size={20} />
-      </a>
+      </button>
+
+      {/* Flyout Format Options Dropdown */}
+      {activeMenu && (
+        <div style={{ position: "absolute", bottom: "46px", left: "-10px", width: "230px", zIndex: 99, background: "#ffffff", border: "1px solid #e2e5f0", borderRadius: "10px", padding: "10px", boxShadow: "0 14px 40px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column", gap: "6px" }}>
+          {activeMenu === "yt" && (
+            <>
+              <div style={{ fontSize: "9px", fontWeight: "800", color: "#FF0000", letterSpacing: "0.5px" }}>🔴 YOUTUBE EXPORT FORMATS</div>
+              <button type="button" onClick={() => handleExport("16:9")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>▶ YouTube 16:9 Bulletin</button>
+              <button type="button" onClick={() => handleExport("9:16")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>⚡ YouTube Shorts 9:16</button>
+            </>
+          )}
+          {activeMenu === "ig" && (
+            <>
+              <div style={{ fontSize: "9px", fontWeight: "800", color: "#D300C5", letterSpacing: "0.5px" }}>📸 INSTAGRAM EXPORT FORMATS</div>
+              <button type="button" onClick={() => handleExport("9:16")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>📱 IG Reels 9:16</button>
+              <button type="button" onClick={() => handleExport("4:5")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>🖼️ IG Portrait Post 4:5</button>
+              <button type="button" onClick={() => handleExport("1:1")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>⏹️ IG Square Feed 1:1</button>
+            </>
+          )}
+          {activeMenu === "fb" && (
+            <>
+              <div style={{ fontSize: "9px", fontWeight: "800", color: "#1877F2", letterSpacing: "0.5px" }}>🟦 FACEBOOK EXPORT FORMATS</div>
+              <button type="button" onClick={() => handleExport("16:9")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>📺 FB Watch 16:9</button>
+              <button type="button" onClick={() => handleExport("9:16")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>⚡ FB Reels 9:16</button>
+              <button type="button" onClick={() => handleExport("1:1")} style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", cursor: "pointer", textAlign: "left" }}>⏹️ FB Square Video 1:1</button>
+            </>
+          )}
+          {activeMenu === "tg" && (
+            <>
+              <div style={{ fontSize: "9px", fontWeight: "800", color: "#229ED9", letterSpacing: "0.5px" }}>✈️ TELEGRAM CHANNEL BUNDLE</div>
+              {jobId && apiBase ? (
+                <>
+                  <a href={`${cleanBase(apiBase)}/api/jobs/${jobId}/srt`} target="_blank" rel="noreferrer" style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", textDecoration: "none" }}>📝 Download Subtitles (.SRT)</a>
+                  <a href={`${cleanBase(apiBase)}/api/jobs/${jobId}/audio`} target="_blank" rel="noreferrer" style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", textDecoration: "none" }}>🎵 Download Audio (.MP3)</a>
+                  <a href={`${cleanBase(apiBase)}/api/jobs/${jobId}/clips`} target="_blank" rel="noreferrer" style={{ padding: "7px 10px", borderRadius: "6px", border: "1px solid #e2e5f0", background: "#f8f9fc", fontSize: "10px", fontWeight: "bold", color: "#0f121d", textDecoration: "none" }}>📊 Export JSON Metadata</a>
+                </>
+              ) : (
+                <div style={{ fontSize: "9px", color: "#777" }}>Upload a video first</div>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -309,7 +348,7 @@ function WorkflowCard({
   apiBase?: string;
   packages?: PackageSummary[];
   renderingClip?: string | null;
-  onRender?: (clipId: string, aspect: "16:9" | "9:16") => void;
+  onRender?: (clipId: string, aspect: "16:9" | "9:16" | "4:5" | "1:1") => void;
   onSelect: () => void;
 }) {
   return (
@@ -323,8 +362,8 @@ function WorkflowCard({
   );
 }
 
-function Inspector({ node, clip, packages, apiBase, jobId, rendering, onClipChange, onRender }: { node: WorkflowNode; clip?: Clip; packages: PackageSummary[]; apiBase: string; jobId?: string; rendering: boolean; onClipChange: (clip: Clip) => void; onRender: (clipId: string, aspect: "16:9" | "9:16") => Promise<void> }) {
-  const [aspect, setAspect] = useState<"16:9" | "9:16">("16:9");
+function Inspector({ node, clip, packages, apiBase, jobId, rendering, onClipChange, onRender }: { node: WorkflowNode; clip?: Clip; packages: PackageSummary[]; apiBase: string; jobId?: string; rendering: boolean; onClipChange: (clip: Clip) => void; onRender: (clipId: string, aspect: "16:9" | "9:16" | "4:5" | "1:1") => Promise<void> }) {
+  const [aspect, setAspect] = useState<"16:9" | "9:16" | "4:5" | "1:1">("16:9");
   const [template, setTemplate] = useState<"tv9_red" | "ntv_gold" | "neon_shorts" | "yellow_ticker">("tv9_red");
 
   const templateConfig = {
@@ -341,7 +380,7 @@ function Inspector({ node, clip, packages, apiBase, jobId, rendering, onClipChan
   };
   const clipPackages = clip ? packages.filter((item) => item.clip_id === clip.id) : [];
 
-  const handleInspectorExport = (targetAspect: "16:9" | "9:16") => {
+  const handleInspectorExport = (targetAspect: "16:9" | "9:16" | "4:5" | "1:1") => {
     if (!clip) return;
     const existing = clipPackages.find((p) => p.aspect === targetAspect);
     if (existing && existing.files.video) {
@@ -376,7 +415,7 @@ function Inspector({ node, clip, packages, apiBase, jobId, rendering, onClipChan
         )) : <div className="readonly-field">Video source loading…</div>}</div>
         <div className="inspector-section"><label>Topic Headline (Telugu Font)</label><textarea readOnly value={clip.title || clip.summary} style={{ fontFamily: templateConfig.font, fontSize: "14px", fontWeight: "600" }} /></div>
         <div className="inspector-section"><label>Motion Graphic Template</label><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", marginTop: "4px" }}><button type="button" onClick={() => setTemplate("tv9_red")} style={{ padding: "6px", borderRadius: "4px", background: template === "tv9_red" ? "#d91f2b" : "#1a1d21", color: "#fff", fontWeight: "bold", border: "1px solid #303640", cursor: "pointer", fontSize: "10px" }}>🔴 TV9 Red Studio</button><button type="button" onClick={() => setTemplate("ntv_gold")} style={{ padding: "6px", borderRadius: "4px", background: template === "ntv_gold" ? "#e5b836" : "#1a1d21", color: template === "ntv_gold" ? "#000" : "#fff", fontWeight: "bold", border: "1px solid #303640", cursor: "pointer", fontSize: "10px" }}>🏆 NTV Gold</button><button type="button" onClick={() => setTemplate("neon_shorts")} style={{ padding: "6px", borderRadius: "4px", background: template === "neon_shorts" ? "#b7f34b" : "#1a1d21", color: template === "neon_shorts" ? "#000" : "#fff", fontWeight: "bold", border: "1px solid #303640", cursor: "pointer", fontSize: "10px" }}>⚡ Cyber Neon</button><button type="button" onClick={() => setTemplate("yellow_ticker")} style={{ padding: "6px", borderRadius: "4px", background: template === "yellow_ticker" ? "#f4e500" : "#1a1d21", color: template === "yellow_ticker" ? "#000" : "#fff", fontWeight: "bold", border: "1px solid #303640", cursor: "pointer", fontSize: "10px" }}>⚡ Yellow Ticker</button></div></div>
-        <div className="inspector-section"><label>Aspect Ratio Format</label><div style={{ display: "flex", gap: "8px", marginTop: "4px" }}><button type="button" onClick={() => setAspect("16:9")} style={{ flex: 1, padding: "8px 4px", borderRadius: "4px", background: aspect === "16:9" ? "#b7f34b" : "#1a1d21", color: aspect === "16:9" ? "#000" : "#a0a5ad", fontWeight: "bold", border: "1px solid #303640", cursor: "pointer", fontSize: "11px" }}>16:9 YouTube / FB</button><button type="button" onClick={() => setAspect("9:16")} style={{ flex: 1, padding: "8px 4px", borderRadius: "4px", background: aspect === "9:16" ? "#b7f34b" : "#1a1d21", color: aspect === "9:16" ? "#000" : "#a0a5ad", fontWeight: "bold", border: "1px solid #303640", cursor: "pointer", fontSize: "11px" }}>9:16 IG Reels / Shorts</button></div></div>
+        <div className="inspector-section"><label>Aspect Ratio Format</label><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", marginTop: "4px" }}><button type="button" onClick={() => setAspect("16:9")} style={{ padding: "6px", borderRadius: "4px", background: aspect === "16:9" ? "#7133EF" : "#ffffff", color: aspect === "16:9" ? "#ffffff" : "#0f121d", fontWeight: "bold", border: "1px solid #e2e5f0", cursor: "pointer", fontSize: "10px" }}>16:9 Bulletin</button><button type="button" onClick={() => setAspect("9:16")} style={{ padding: "6px", borderRadius: "4px", background: aspect === "9:16" ? "#7133EF" : "#ffffff", color: aspect === "9:16" ? "#ffffff" : "#0f121d", fontWeight: "bold", border: "1px solid #e2e5f0", cursor: "pointer", fontSize: "10px" }}>9:16 Reels/Shorts</button><button type="button" onClick={() => setAspect("4:5")} style={{ padding: "6px", borderRadius: "4px", background: aspect === "4:5" ? "#7133EF" : "#ffffff", color: aspect === "4:5" ? "#ffffff" : "#0f121d", fontWeight: "bold", border: "1px solid #e2e5f0", cursor: "pointer", fontSize: "10px" }}>4:5 Portrait Post</button><button type="button" onClick={() => setAspect("1:1")} style={{ padding: "6px", borderRadius: "4px", background: aspect === "1:1" ? "#7133EF" : "#ffffff", color: aspect === "1:1" ? "#ffffff" : "#0f121d", fontWeight: "bold", border: "1px solid #e2e5f0", cursor: "pointer", fontSize: "10px" }}>1:1 Square Feed</button></div></div>
         <div className="confidence-row"><span>Editorial score</span><strong>{clip.score?.final_score?.toFixed(1) ?? "—"} / 10</strong></div>
         <div className="confidence-bar"><i style={{ width: `${(clip.score?.final_score ?? 0) * 10}%` }} /></div>
         {(clip.overlap_count > 0 || clip.speech_overlap_count > 0) && <p className="quality-warning">Review required: {clip.overlap_count} clip overlap(s), {clip.speech_overlap_count} speech overlap(s).</p>}
@@ -391,7 +430,7 @@ function Inspector({ node, clip, packages, apiBase, jobId, rendering, onClipChan
             style={{ padding: "10px 8px", borderRadius: "8px", background: "#ffffff", border: "1px solid #e2e5f0", color: "#0f121d", fontWeight: "bold", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
           >
             <YouTubeIcon size={20} />
-            <span>{clipPackages.some((p) => p.aspect === "16:9") ? "Download 16:9" : "Export YouTube"}</span>
+            <span>YouTube 16:9</span>
           </button>
           <button
             type="button"
@@ -400,26 +439,26 @@ function Inspector({ node, clip, packages, apiBase, jobId, rendering, onClipChan
             style={{ padding: "10px 8px", borderRadius: "8px", background: "#ffffff", border: "1px solid #e2e5f0", color: "#0f121d", fontWeight: "bold", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
           >
             <InstagramIcon size={20} />
-            <span>{clipPackages.some((p) => p.aspect === "9:16") ? "Download 9:16" : "Export IG Reels"}</span>
+            <span>IG Reels 9:16</span>
           </button>
           <button
             type="button"
-            onClick={() => handleInspectorExport("16:9")}
+            onClick={() => handleInspectorExport("4:5")}
+            disabled={!clip || rendering}
+            style={{ padding: "10px 8px", borderRadius: "8px", background: "#ffffff", border: "1px solid #e2e5f0", color: "#0f121d", fontWeight: "bold", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
+          >
+            <InstagramIcon size={20} />
+            <span>IG Post 4:5</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleInspectorExport("1:1")}
             disabled={!clip || rendering}
             style={{ padding: "10px 8px", borderRadius: "8px", background: "#ffffff", border: "1px solid #e2e5f0", color: "#0f121d", fontWeight: "bold", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
           >
             <FacebookIcon size={20} />
-            <span>FB Watch</span>
+            <span>FB Square 1:1</span>
           </button>
-          <a
-            href={jobId ? `${cleanBase(apiBase)}/api/jobs/${jobId}/srt` : "#"}
-            target="_blank"
-            rel="noreferrer"
-            style={{ padding: "10px 8px", borderRadius: "8px", background: "#ffffff", border: "1px solid #e2e5f0", color: "#0f121d", fontWeight: "bold", textDecoration: "none", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
-          >
-            <TelegramIcon size={20} />
-            <span>Telegram SRT</span>
-          </a>
         </div>
       </div>
       <button className="primary-action" onClick={clip ? reviewClip : undefined} disabled={!clip}>{clip?.state === "ok" ? "Approved ✓ (Click to review)" : "Approve clip"}<span>→</span></button>
